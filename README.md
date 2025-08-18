@@ -1,10 +1,10 @@
-# Advocacy Workshop
+# Presto Lakehouse Workshop
 
 ## Status
 
 * Hudi integration ✅ complete
-* Iceberg integration ⌛ in progress
-* Delta Lake integration 🗓️ planned
+* Iceberg integration ✅ complete
+* Delta Lake integration ⌛ in progress
 
 ## Workshop website
 

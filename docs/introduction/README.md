@@ -15,13 +15,13 @@ A data lakehouse combines the query speed and data quality of a data warehouse w
 
 ![lakehouse architecture](../images/lakehouse-architecture.png)
 
-As seen in the above diagram, Presto and Apache Hudi are open source projects that each have a place in the open data lakehouse. Let's look at where they fit in the ecosystem below.
+As seen in the above diagram, Presto, Apache Iceberg, and Apache Hudi are open source projects that each have a place in the open data lakehouse. Let's look at where they fit in the ecosystem below.
 
 ## Presto Overview
 
 Presto is a query engine, which is a piece of software that sits on top of the underlying data storage architecture and fulfills requests for data by optimizing the data retrieval process. More specifically, Presto is a *distributed* query engine for fast SQL-based analytics.
 
-Presto is flexible and supports querying across diverse sources, including both structured relational databases and unstructured and semi-structured NoSQL data sources. Presto uses what it calls 'connectors' to integrate with this wide range of external data sources. Any data source can be queried as long as the data source adapts to the API expected by Presto. This makes Presto extremely flexible and extensible. Likewise, Presto supports many different file formats, such as ORC, Avro, Parquet, CSV, JSON, and more. Presto also supports a few different table formats including Delta Lake and Apache Hudi.
+Presto is flexible and supports querying across diverse sources, including both structured relational databases and unstructured and semi-structured NoSQL data sources. Presto uses what it calls 'connectors' to integrate with this wide range of external data sources. Any data source can be queried as long as the data source adapts to the API expected by Presto. This makes Presto extremely flexible and extensible. Likewise, Presto supports many different file formats, such as ORC, Avro, Parquet, CSV, JSON, and more. Presto also supports the three big open source table formats: Apache Iceberg, Delta Lake, and Apache Hudi.
 
 Presto was open-sourced in 2019 when it was donated to the Linux Foundation and is under the open source governance of the Presto Foundation. All of these reasons make it the perfect choice of query engine for an open data lakehouse.
 

@@ -93,7 +93,7 @@ Next we specify any necesssary environment variables. In this case, we give the 
 
 Let's do the same for the `hive-metastore` service, which has a few lines we haven't seen yet. The `build` property is what allowed us to build the custom image located in the `hive-metastore` directory in the previous step. We'll specify the image that we just created as the `image` property value. We also give a `hostname` for this container, the value of which we supply in the `metastore-site.xml` configuration file, which itself is mapped to the appropriate location inside the container using the `volumes` property. The last property that we will call out is `depends_on`, which defines dependencies between our service containers. In this case, the `mysql` container will be started before the `hive-metastore` Presto container. This makes sense since the MySQL database needs to be running before the Hive metastore service can start.
 
-The `minio` container is our s3 service that we supply our access key and secret to. The `mc` container creates a bucket in our s3 storage (called `warehouse`) that will be where we eventually place our Hudi tables. These services don't require as much setup as the others.
+The `minio` container is our s3 service that we supply our access key and secret to. The `mc` container creates a bucket in our s3 storage (called `warehouse`) that will be where we eventually place our tables. These services don't require as much setup as the others.
 
 Finally, our `hudi-spark` service starts up a Spark cluster with a handful of required properties files and the jars that we downloaded in the pre-work steps.
 
