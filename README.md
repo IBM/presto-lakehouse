@@ -1,24 +1,16 @@
 # Advocacy Workshop
 
-This is a template for workshops hosted on GitHub Pages using Material for MkDocs. To view it online, go to:
+## Status
 
-<https://ibm.github.io/repo-name>
+* Hudi integration ✅ complete
+* Iceberg integration ⌛ in progress
+* Delta Lake integration 🗓️ planned
 
-Create a new repo based off this template, and use the following folders as a guide:
+## Workshop website
 
-```ini
+To view this workshop online, go to:
 
-- data (any data (CSV, JSON, etc files) to be used)
-- docs (this is where the workshop is documented)
-|_ <folder-n> (these are exercises for the workshop)
-  |_README.md (the steps for the exercise, in Markdown)
-|_ README.md (this will appear on the gitbook home page)
-- notebooks (any Jupyter notebooks can go here)
-- src (any application source code can go here)
-.mkdocs.yaml (configuration for mkdocs)
-.travis.yaml (runs markdownlint by default)
-README.md (only used for GitHub.com)
-```
+<https://ibm.github.io/presto-lakehouse>
 
 ## Tips and conventions
 
