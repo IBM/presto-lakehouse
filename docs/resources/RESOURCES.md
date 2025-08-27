@@ -20,6 +20,7 @@
 * [Iceberg Documentation](https://iceberg.apache.org/docs/nightly/)
 * [Iceberg GitHub Repo](https://github.com/apache/iceberg)
 * [Iceberg Slack](https://apache-iceberg.slack.com/ssb/redirect)
+* [Presto Iceberg Connector](https://prestodb.io/docs/current/connector/iceberg.html)
 
 ## Hudi
 
@@ -31,6 +32,15 @@
 * [Hudi LinkedIn](https://www.linkedin.com/company/apache-hudi/posts/?feedView=all&viewAsMember=true)
 * [Hudi Twitter](https://communityinviter.com/apps/prestodb/prestodb)
 * [Hudi YouTube Channel](https://www.youtube.com/channel/UCs7AhE0BWaEPZSChrBR-Muw)
+* [Presto Hudi Connector](https://prestodb.io/docs/current/connector/hudi.html)
+
+## Delta Lake
+
+* [Delta Lake](https://delta.io/)
+* [Delta Lake Documentation](https://docs.delta.io/)
+* [Delta Lake GitHub Repo](https://github.com/delta-io/delta)
+* [Delta Lake Slack](https://delta-users.slack.com/signup#/domain-signup)
+* [Presto Delta Conncector](https://prestodb.io/docs/current/connector/deltalake.html)
 
 ## MinIO
 

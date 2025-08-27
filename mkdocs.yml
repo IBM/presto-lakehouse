@@ -16,8 +16,9 @@ nav:
     - Lab 0. Pre-work: pre-work/README.md
     - Lab 1. Set up an Open Lakehouse: lab-1/README.md
     - Lab 2. Create and Query Iceberg Tables: lab-2/README.md
-    - Lab 3. Create and Query Basic Hudi Tables: lab-2/README.md
-    - Lab 4. Explore Hudi Table & Query Types: lab-3/README.md
+    - Lab 3. Create and Query Basic Hudi Tables: lab-3/README.md
+    - Lab 4. Explore Hudi Table & Query Types: lab-4/README.md
+    - Lab 5. Create and Query Delta Lake Tables: lab-5/README.md
   - References:
     - Additional Resources: resources/RESOURCES.md
     - Contributors: resources/CONTRIBUTORS.md

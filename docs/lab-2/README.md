@@ -65,7 +65,7 @@ These are the catalogs that we specified when launching the coordinator containe
 Now, let's create a schema. A schema is a logical way to organize tables within a catalog. We'll create a schema called "minio" within our "iceberg" catalog. We also want to specify that the tables within this schema are all located in our s3 storage, and more specifically, in the `warehouse` bucket that was created by the `mc` service when we started our containers.
 
 ```sh
-presto> CREATE SCHEMA iceberg.minio with (location = 's3a://warehouse/');
+presto> CREATE SCHEMA iceberg.minio with (location = 's3a://warehouse/iceberg-tables/');
 CREATE SCHEMA
 ```
 
@@ -115,7 +115,7 @@ presto:minio> SELECT * FROM books;
 (3 rows)
 ```
 
-If we go back to our MinIO UI now, we can see a new folder, `data` in the `warehouse/books` path. The `data` folder has a single `.parquet` data file inside. This structure of `data` and `metadata` folders is the default for Iceberg tables.
+If we go back to our MinIO UI now, we can see a new folder, `data` in the `warehouse/iceberg-tables/books` path. The `data` folder has a single `.parquet` data file inside. This structure of `data` and `metadata` folders is the default for Iceberg tables.
 
 We can query some of the Iceberg metadata information from Presto. Let's look at the hidden "history" table from Presto. Note that the quotation marks are required here.
 
