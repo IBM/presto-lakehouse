@@ -34,15 +34,16 @@ After you run the command, the prompt should change from the shell prompt `$` to
 presto> show catalogs;
  Catalog 
 ---------
- hive
+ delta   
+ hive    
  hudi    
- iceberg
+ iceberg 
  jmx     
  memory  
  system  
  tpcds   
  tpch    
-(7 rows)
+(9 rows)
 
 Query 20231122_230131_00021_79xda, FINISHED, 1 node
 Splits: 19 total, 19 done (100.00%)
