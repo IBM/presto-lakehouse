@@ -83,14 +83,20 @@ val dataGen = new DataGenerator
 val inserts = convertToStringList(dataGen.generateInserts(10))
 val data = spark.read.json(spark.sparkContext.parallelize(inserts, 2))
 
-val tableName = "trips_table"
+val tableName = "delta_trips_table"
 
 data.withColumn("commit_num", lit("update1")).write.format("delta").
     mode(Overwrite).
     save(s"$basePath/$tableName");
 ```
 
-Before we go on to query these tables, let's take a look at what files and directories have been created for this table in our s3 storage. Go to MinIO UI [http://localhost:9091](http://localhost:9091) and log in with the username and password that we defined in `docker-compose.yaml` (`minio`/`minio123`). Under the `delta-tables` path, there should be a sub-path called `trips_table`. Click into this path and explore the created files and directory structure, include those in the `_delta_log` directory. This is where Delta keeps metadata for the `trips_table`. TODO add more details here including potential screenshot.
+Before we go on to query these tables, let's take a look at what files and directories have been created for this table in our s3 storage. Go to MinIO UI [http://localhost:9091](http://localhost:9091) and log in with the username and password that we defined in `docker-compose.yaml` (`minio`/`minio123`). Under the `delta-tables` path, there should be a sub-path called `delta_trips_table`.
+
+![delta files](../images/delta-base.png)
+
+Click into this path and explore the created files and directory structure, including those in the `_delta_log` directory. This is where Delta keeps metadata for the `delta_trips_table`. You'll notice a single JSON file with a `0` index, indicating that we only have one tavle commit so far.
+
+![delta log files](../images/delta-logs.png)
 
 ## 2. Query table with Presto
 
@@ -100,13 +106,13 @@ Now let's query these tables with Presto. In a new terminal tab or window, exec 
  docker exec -it coordinator presto-cli
 ```
 
-There are a handful of ways to query a Delta Lake table with Presto. The first is by registering a table with an external location that corresponds to the path where the table is stored.
+There are a handful of ways to query a Delta Lake table with Presto. First, however, we have to register the table with an external location that corresponds to the path where the table is stored.
 
 ```sh
-CREATE TABLE delta.default.trips_table (dummyColumn INT) WITH (external_location = 's3a://warehouse/delta-tables/trips_table');
+CREATE TABLE delta.default.delta_trips_table (dummyColumn INT) WITH (external_location = 's3a://warehouse/delta-tables/delta_trips_table');
 ```
 
-TODO explain the dummy column and otherwise why we're doing this.
+> To register a table in Hive metastore, full schema of the table is not required in DDL as the Delta Lake connector gets the schema from the metadata located at the Delta Lake table location. To get around a 'no columns' error in Hive metastore, we provide a dummy column as schema of the Delta table being registered.
 
 Now we can list the available tables:
 
@@ -118,28 +124,34 @@ For example:
 
 ```sh
 presto> show tables in delta.default;
-       Table        
+       Table         
 --------------------
+ cow_trips_table    
+ delta_trips_table  
+ mor_trips_table_ro 
+ mor_trips_table_rt 
  trips_table        
-(1 rows)
+(5 rows)
 ```
 
-and also read from our table with a statement such as:
+You will see the Hudi tables we created in the last two labs if you are completing these labs all at once. This is because `default` is a schema of the Hive metastore, and our Spark table creation statements for both catalogs specified to use the `default` schema. This is also why we didn't need to explicitly create a schema like we did in the Iceberg lab.
+
+We can read from our table with a statement such as:
 
 ```sql
-select commit_num, fare, begin_lon, begin_lat from delta.default.trips_table;
+select commit_num, fare, begin_lon, begin_lat from delta.default.delta_trips_table;
 ```
 
-We can also query our table using a special syntax that supplies the direct path to the table. Note how in this command, we don't specify a table name at all, just the path to the data.
+Instead of registering the table, we can also query the table using a special syntax that supplies the direct path to the table. Note how in this command, we don't specify a table name at all, just the path to the data. You can avoid the table creation step above using these queries.
 
 ```sql
-select commit_num, fare, begin_lon, begin_lat from delta."$path$"."s3a://warehouse/delta-tables/trips_table";
+select commit_num, fare, begin_lon, begin_lat from delta."$path$"."s3a://warehouse/delta-tables/delta_trips_table";
 ```
 
 For example:
 
 ```sh
-presto:default> select commit_num, fare, begin_lon, begin_lat from delta."$path$"."s3a://warehouse/delta-tables/trips_table";
+presto:default> select commit_num, fare, begin_lon, begin_lat from delta."$path$"."s3a://warehouse/delta-tables/delta_trips_table";
  commit_num |        fare        |      begin_lon       |      begin_lat       
 ------------+--------------------+----------------------+----------------------
  update1    | 34.158284716382845 |  0.46157858450465483 |   0.4726905879569653 
@@ -154,7 +166,7 @@ presto:default> select commit_num, fare, begin_lon, begin_lat from delta."$path$
 (10 rows)
 ```
 
-TODO show other ways to query the table
+It is also possible to query Delta tables using a timestamp. The [Presto documentation for the Delta Lake connector](https://prestodb.io/docs/current/connector/deltalake.html#querying-delta-lake-tables) gives an example.
 
 ## 3. Add data to table and query
 
@@ -172,13 +184,13 @@ updatedData.withColumn("commit_num", lit("update2")).write.format("delta").
 Now we can query the table in the Presto CLI using the snapshot identifier. Since we've added data to our table twice, we now have 2 snapshots - a `v0` snapshot and a `v1` snapshot. Let's query them to see the difference.
 
 ```sql
-select commit_num, fare, begin_lon, begin_lat from delta.default."trips_table@v1"
+select commit_num, fare, begin_lon, begin_lat from delta.default."delta_trips_table@v1";
 ```
 
 For example:
 
 ```sh
-presto> select commit_num, fare, begin_lon, begin_lat from delta.default."trips_table@v1";
+presto> select commit_num, fare, begin_lon, begin_lat from delta.default."delta_trips_table@v1";
  commit_num |        fare        |      begin_lon       |      begin_lat       
 ------------+--------------------+----------------------+----------------------
  update1    | 34.158284716382845 |  0.46157858450465483 |   0.4726905879569653 
@@ -207,13 +219,13 @@ presto> select commit_num, fare, begin_lon, begin_lat from delta.default."trips_
 We can see that this table includes commits both from update 1 and update 2. Let's see what version `v0` looks like.
 
 ```sql
-select commit_num, fare, begin_lon, begin_lat from delta.default."trips_table@v0"
+select commit_num, fare, begin_lon, begin_lat from delta.default."delta_trips_table@v0";
 ```
 
 For example:
 
 ```sh
-presto> select commit_num, fare, begin_lon, begin_lat from delta.default."trips_table@v1";
+presto> select commit_num, fare, begin_lon, begin_lat from delta.default."delta_trips_table@v1";
  commit_num |        fare        |      begin_lon       |      begin_lat       
 ------------+--------------------+----------------------+----------------------
  update1    | 34.158284716382845 |  0.46157858450465483 |   0.4726905879569653 
@@ -233,13 +245,13 @@ Here we see the data only from our first commit, which was the original creation
 Similar to Iceberg, you can also query snapshots by timestamp as well. To make this query, you'll have to choose a time between the first and second commit to the table. One easy way to determine this is by looking at the Minio UI. Look at the time when the `0000000000000.json` file was created in your local time. Convert this to 12 hours time, and then also add or subtract an offset to determine the GMT time of this timestamp. So, for example, I created my table at 5:43 pm CDT. This means that I created my table at 17:43 CDT and there is a -5 hours offset between CDT and GMT, which means my final timestamp is 22:43 GMT. This means I will make the following query:
 
 ```sql
-select commit_num, fare, begin_lon, begin_lat from delta.default."trips_table@t2025-08-27 22:45";
+select commit_num, fare, begin_lon, begin_lat from delta.default."delta_trips_table@t2025-08-27 22:45";
 ```
 
 For example:
 
 ```sh
-presto> select commit_num, fare, begin_lon, begin_lat from delta.default."trips_table@t2025-08-27 22:45";
+presto> select commit_num, fare, begin_lon, begin_lat from delta.default."delta_trips_table@t2025-08-27 22:45";
  commit_num |        fare        |      begin_lon      |      begin_lat      
 ------------+--------------------+---------------------+---------------------
  update1    | 34.158284716382845 | 0.46157858450465483 |  0.4726905879569653 
@@ -258,6 +270,10 @@ presto> select commit_num, fare, begin_lon, begin_lat from delta.default."trips_
 We can once again see that we're only given the data from our first commit.
 
 We can also look in the MinIO UI again to see the different files that have been created. Notice in the `_delta_log` path that we have two `json` metadata files, the name of which corresponds to the snapshot number.
+
+![delta logs 2](../images/delta_logs2.png)
+
+You will also notice new data files in the parent folder. By default, Delta table are copy-on-write, meaning they rewrite entire data files that contain the records being modified. This behavior can be optimized by using a Delta feature called "deletion vectors", which provide merge-on-read capabilities.
 
 From here, you can experiment with adding data to our table and exploring how the queries and s3 storage files change.
 
