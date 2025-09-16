@@ -1,0 +1,1245 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+        <meta name="author" content="IBM Developer">
+      
+      
+        <link rel="canonical" href="https://ibm.github.io/presto-lakehouse/lab-3/">
+      
+      
+        <link rel="prev" href="../lab-2/">
+      
+      
+        <link rel="next" href="../lab-4/">
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.20">
+    
+    
+      
+        <title>Lab 3. Create and Query Basic Hudi Tables - Presto Lakehouse Workshop</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.e53b48f4.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans:300,300i,400,400i,700,700i%7CIBM+Plex+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"IBM Plex Sans";--md-code-font:"IBM Plex Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+      
+        <meta  property="og:type"  content="website" >
+      
+        <meta  property="og:title"  content="Lab 3. Create and Query Basic Hudi Tables - Presto Lakehouse Workshop" >
+      
+        <meta  property="og:description"  content="None" >
+      
+        <meta  property="og:image"  content="https://ibm.github.io/presto-lakehouse/assets/images/social/lab-3/README.png" >
+      
+        <meta  property="og:image:type"  content="image/png" >
+      
+        <meta  property="og:image:width"  content="1200" >
+      
+        <meta  property="og:image:height"  content="630" >
+      
+        <meta  property="og:url"  content="https://ibm.github.io/presto-lakehouse/lab-3/" >
+      
+        <meta  name="twitter:card"  content="summary_large_image" >
+      
+        <meta  name="twitter:title"  content="Lab 3. Create and Query Basic Hudi Tables - Presto Lakehouse Workshop" >
+      
+        <meta  name="twitter:description"  content="None" >
+      
+        <meta  name="twitter:image"  content="https://ibm.github.io/presto-lakehouse/assets/images/social/lab-3/README.png" >
+      
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="blue">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#create-and-query-basic-hudi-tables" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Presto Lakehouse Workshop" class="md-header__button md-logo" aria-label="Presto Lakehouse Workshop" data-md-component="logo">
+      
+  <img src="../images/ibm-blue-background.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Presto Lakehouse Workshop
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Lab 3. Create and Query Basic Hudi Tables
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/IBM/presto-lakehouse.git" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    presto-lakehouse
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href=".." class="md-tabs__link">
+          
+  
+  
+  Welcome
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../pre-work/" class="md-tabs__link">
+          
+  
+  
+  Workshop
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../resources/RESOURCES/" class="md-tabs__link">
+          
+  
+  
+  References
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Presto Lakehouse Workshop" class="md-nav__button md-logo" aria-label="Presto Lakehouse Workshop" data-md-component="logo">
+      
+  <img src="../images/ibm-blue-background.png" alt="logo">
+
+    </a>
+    Presto Lakehouse Workshop
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/IBM/presto-lakehouse.git" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    presto-lakehouse
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Welcome
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            Welcome
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    About the workshop
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Workshop
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Workshop
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pre-work/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Lab 0. Pre-work
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lab-1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Lab 1. Set up an Open Lakehouse
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lab-2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Lab 2. Create and Query Iceberg Tables
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Lab 3. Create and Query Basic Hudi Tables
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Lab 3. Create and Query Basic Hudi Tables
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-create-hudi-tables" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Create Hudi tables
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-query-table-with-presto" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Query table with Presto
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-add-data-to-table-and-query" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Add data to table and query
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Add data to table and query">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#optional-shutdown" class="md-nav__link">
+    <span class="md-ellipsis">
+      Optional shutdown
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lab-4/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Lab 4. Explore Hudi Table & Query Types
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lab-5/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Lab 5. Create and Query Delta Lake Tables
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    References
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            References
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../resources/RESOURCES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Additional Resources
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../resources/CONTRIBUTORS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Contributors
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../resources/MKDOCS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    MkDocs Cheatsheet
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../resources/ADMIN/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Admin Guide
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-create-hudi-tables" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Create Hudi tables
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-query-table-with-presto" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Query table with Presto
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-add-data-to-table-and-query" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Add data to table and query
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Add data to table and query">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#optional-shutdown" class="md-nav__link">
+    <span class="md-ellipsis">
+      Optional shutdown
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="create-and-query-basic-hudi-tables">Create and Query Basic Hudi Tables<a class="headerlink" href="#create-and-query-basic-hudi-tables" title="Permanent link">&para;</a></h1>
+<p>In this section, you will create basic Hudi tables with Spark and query them with Presto.</p>
+<p>This section is comprised of the following steps:</p>
+<ul>
+<li><a href="#create-and-query-basic-hudi-tables">Create and Query Basic Hudi Tables</a></li>
+<li><a href="#1-create-hudi-tables">1. Create Hudi tables</a></li>
+<li><a href="#2-query-table-with-presto">2. Query table with Presto</a></li>
+<li><a href="#3-add-data-to-table-and-query">3. Add data to table and query</a><ul>
+<li><a href="#optional-shutdown">Optional shutdown</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="1-create-hudi-tables">1. Create Hudi tables<a class="headerlink" href="#1-create-hudi-tables" title="Permanent link">&para;</a></h2>
+<p>In this section we'll explore Hudi tables. Currently, it is not possible to create Hudi tables from Presto, so we will use Spark to create our tables. To do so, we'll enter the Spark container and start the <code>spark-shell</code>:</p>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>spark<span class="w"> </span>/opt/spark/bin/spark-shell
+</span></code></pre></div>
+<p>It may take a few moments to initialize before you see the <code>scala&gt;</code> prompt, indicating that the shell is ready to accept commands. Enter "paste" mode by typing the following and pressing enter:</p>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>:paste
+</span></code></pre></div>
+<p>For example:</p>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>scala&gt;<span class="w"> </span>:paste
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>//<span class="w"> </span>Entering<span class="w"> </span>paste<span class="w"> </span>mode<span class="w"> </span><span class="o">(</span>ctrl-D<span class="w"> </span>to<span class="w"> </span>finish<span class="o">)</span>
+</span></code></pre></div>
+<p>Copy and paste the below code, which imports required packages, creates a Spark session, and defines some variables that we will reference in subsequent code.</p>
+<div class="language-scala highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">import</span><span class="w"> </span><span class="nn">org</span><span class="p">.</span><span class="nn">apache</span><span class="p">.</span><span class="nn">spark</span><span class="p">.</span><span class="nn">sql</span><span class="p">.{</span><span class="nc">SparkSession</span><span class="p">,</span><span class="w"> </span><span class="nc">SaveMode</span><span class="p">}</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="k">import</span><span class="w"> </span><span class="nn">scala</span><span class="p">.</span><span class="nn">util</span><span class="p">.</span><span class="nc">Random</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="k">import</span><span class="w"> </span><span class="nn">java</span><span class="p">.</span><span class="nn">util</span><span class="p">.</span><span class="nc">UUID</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="kd">val</span><span class="w"> </span><span class="n">spark</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nc">SparkSession</span><span class="p">.</span><span class="n">builder</span><span class="p">()</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">  </span><span class="p">.</span><span class="n">appName</span><span class="p">(</span><span class="s">&quot;HudiToMinIO&quot;</span><span class="p">)</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">  </span><span class="p">.</span><span class="n">config</span><span class="p">(</span><span class="s">&quot;spark.serializer&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;org.apache.spark.serializer.KryoSerializer&quot;</span><span class="p">)</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">  </span><span class="p">.</span><span class="n">config</span><span class="p">(</span><span class="s">&quot;spark.sql.catalogImplementation&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;hive&quot;</span><span class="p">)</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">  </span><span class="p">.</span><span class="n">config</span><span class="p">(</span><span class="s">&quot;hive.metastore.uris&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;thrift://hive-metastore:9083&quot;</span><span class="p">)</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">  </span><span class="p">.</span><span class="n">config</span><span class="p">(</span><span class="s">&quot;spark.sql.hive.convertMetastoreParquet&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;false&quot;</span><span class="p">)</span>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">  </span><span class="p">.</span><span class="n">config</span><span class="p">(</span><span class="s">&quot;spark.hadoop.fs.s3a.endpoint&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;http://minio:9000&quot;</span><span class="p">)</span>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="w">  </span><span class="p">.</span><span class="n">config</span><span class="p">(</span><span class="s">&quot;spark.hadoop.fs.s3a.access.key&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;minio&quot;</span><span class="p">)</span>
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="w">  </span><span class="p">.</span><span class="n">config</span><span class="p">(</span><span class="s">&quot;spark.hadoop.fs.s3a.secret.key&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;minio123&quot;</span><span class="p">)</span>
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="w">  </span><span class="p">.</span><span class="n">config</span><span class="p">(</span><span class="s">&quot;spark.hadoop.fs.s3a.path.style.access&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;true&quot;</span><span class="p">)</span>
+</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="w">  </span><span class="p">.</span><span class="n">config</span><span class="p">(</span><span class="s">&quot;spark.hadoop.fs.s3a.impl&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;org.apache.hadoop.fs.s3a.S3AFileSystem&quot;</span><span class="p">)</span>
+</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="w">  </span><span class="p">.</span><span class="n">config</span><span class="p">(</span><span class="s">&quot;spark.hadoop.fs.s3a.connection.ssl.enabled&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;false&quot;</span><span class="p">)</span>
+</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a><span class="w">  </span><span class="p">.</span><span class="n">config</span><span class="p">(</span><span class="s">&quot;spark.sql.extensions&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;org.apache.spark.sql.hudi.HoodieSparkSessionExtension&quot;</span><span class="p">)</span>
+</span><span id="__span-3-18"><a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a><span class="w">  </span><span class="p">.</span><span class="n">config</span><span class="p">(</span><span class="s">&quot;spark.sql.catalog.spark_catalog&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;org.apache.spark.sql.hudi.catalog.HoodieCatalog&quot;</span><span class="p">)</span>
+</span><span id="__span-3-19"><a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a><span class="w">  </span><span class="p">.</span><span class="n">config</span><span class="p">(</span><span class="s">&quot;spark.kryo.registrator&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;org.apache.spark.HoodieSparkKryoRegistrar&quot;</span><span class="p">)</span>
+</span><span id="__span-3-20"><a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a><span class="w">  </span><span class="p">.</span><span class="n">enableHiveSupport</span><span class="p">()</span>
+</span><span id="__span-3-21"><a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a><span class="w">  </span><span class="p">.</span><span class="n">getOrCreate</span><span class="p">()</span>
+</span><span id="__span-3-22"><a id="__codelineno-3-22" name="__codelineno-3-22" href="#__codelineno-3-22"></a>
+</span><span id="__span-3-23"><a id="__codelineno-3-23" name="__codelineno-3-23" href="#__codelineno-3-23"></a><span class="k">import</span><span class="w"> </span><span class="nn">spark</span><span class="p">.</span><span class="nn">implicits</span><span class="p">.</span><span class="n">_</span>
+</span><span id="__span-3-24"><a id="__codelineno-3-24" name="__codelineno-3-24" href="#__codelineno-3-24"></a><span class="k">import</span><span class="w"> </span><span class="nn">org</span><span class="p">.</span><span class="nn">apache</span><span class="p">.</span><span class="nn">hudi</span><span class="p">.</span><span class="nc">QuickstartUtils</span><span class="p">.</span><span class="n">_</span>
+</span><span id="__span-3-25"><a id="__codelineno-3-25" name="__codelineno-3-25" href="#__codelineno-3-25"></a><span class="k">import</span><span class="w"> </span><span class="nn">scala</span><span class="p">.</span><span class="nn">collection</span><span class="p">.</span><span class="nc">JavaConversions</span><span class="p">.</span><span class="n">_</span>
+</span><span id="__span-3-26"><a id="__codelineno-3-26" name="__codelineno-3-26" href="#__codelineno-3-26"></a><span class="k">import</span><span class="w"> </span><span class="nn">org</span><span class="p">.</span><span class="nn">apache</span><span class="p">.</span><span class="nn">spark</span><span class="p">.</span><span class="nn">sql</span><span class="p">.</span><span class="nc">SaveMode</span><span class="p">.</span><span class="n">_</span>
+</span><span id="__span-3-27"><a id="__codelineno-3-27" name="__codelineno-3-27" href="#__codelineno-3-27"></a><span class="k">import</span><span class="w"> </span><span class="nn">org</span><span class="p">.</span><span class="nn">apache</span><span class="p">.</span><span class="nn">hudi</span><span class="p">.</span><span class="nc">DataSourceReadOptions</span><span class="p">.</span><span class="n">_</span>
+</span><span id="__span-3-28"><a id="__codelineno-3-28" name="__codelineno-3-28" href="#__codelineno-3-28"></a><span class="k">import</span><span class="w"> </span><span class="nn">org</span><span class="p">.</span><span class="nn">apache</span><span class="p">.</span><span class="nn">hudi</span><span class="p">.</span><span class="nc">DataSourceWriteOptions</span><span class="p">.</span><span class="n">_</span>
+</span><span id="__span-3-29"><a id="__codelineno-3-29" name="__codelineno-3-29" href="#__codelineno-3-29"></a><span class="k">import</span><span class="w"> </span><span class="nn">org</span><span class="p">.</span><span class="nn">apache</span><span class="p">.</span><span class="nn">hudi</span><span class="p">.</span><span class="nn">config</span><span class="p">.</span><span class="nc">HoodieWriteConfig</span><span class="p">.</span><span class="n">_</span>
+</span><span id="__span-3-30"><a id="__codelineno-3-30" name="__codelineno-3-30" href="#__codelineno-3-30"></a>
+</span><span id="__span-3-31"><a id="__codelineno-3-31" name="__codelineno-3-31" href="#__codelineno-3-31"></a><span class="kd">val</span><span class="w"> </span><span class="n">basePath</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;s3a://warehouse/hudi-tables&quot;</span>
+</span><span id="__span-3-32"><a id="__codelineno-3-32" name="__codelineno-3-32" href="#__codelineno-3-32"></a><span class="kd">val</span><span class="w"> </span><span class="n">dbName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;default&quot;</span>
+</span><span id="__span-3-33"><a id="__codelineno-3-33" name="__codelineno-3-33" href="#__codelineno-3-33"></a>
+</span><span id="__span-3-34"><a id="__codelineno-3-34" name="__codelineno-3-34" href="#__codelineno-3-34"></a><span class="k">def</span><span class="w"> </span><span class="nf">hudiOptions</span><span class="p">(</span><span class="n">tableName</span><span class="p">:</span><span class="w"> </span><span class="nc">String</span><span class="p">,</span><span class="w"> </span><span class="n">tableType</span><span class="p">:</span><span class="w"> </span><span class="nc">String</span><span class="p">,</span><span class="w"> </span><span class="n">precombineField</span><span class="p">:</span><span class="w"> </span><span class="nc">String</span><span class="p">,</span><span class="w"> </span><span class="n">partitionField</span><span class="p">:</span><span class="w"> </span><span class="nc">Option</span><span class="p">[</span><span class="nc">String</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nc">None</span><span class="p">):</span><span class="w"> </span><span class="nc">Map</span><span class="p">[</span><span class="nc">String</span><span class="p">,</span><span class="w"> </span><span class="nc">String</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-35"><a id="__codelineno-3-35" name="__codelineno-3-35" href="#__codelineno-3-35"></a><span class="w">  </span><span class="nc">Map</span><span class="p">(</span>
+</span><span id="__span-3-36"><a id="__codelineno-3-36" name="__codelineno-3-36" href="#__codelineno-3-36"></a><span class="w">    </span><span class="s">&quot;hoodie.table.name&quot;</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">tableName</span><span class="p">,</span>
+</span><span id="__span-3-37"><a id="__codelineno-3-37" name="__codelineno-3-37" href="#__codelineno-3-37"></a><span class="w">    </span><span class="s">&quot;hoodie.datasource.write.recordkey.field&quot;</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span><span class="p">,</span>
+</span><span id="__span-3-38"><a id="__codelineno-3-38" name="__codelineno-3-38" href="#__codelineno-3-38"></a><span class="w">    </span><span class="s">&quot;hoodie.datasource.write.precombine.field&quot;</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">precombineField</span><span class="p">,</span>
+</span><span id="__span-3-39"><a id="__codelineno-3-39" name="__codelineno-3-39" href="#__codelineno-3-39"></a><span class="w">    </span><span class="s">&quot;hoodie.datasource.write.table.name&quot;</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">tableName</span><span class="p">,</span>
+</span><span id="__span-3-40"><a id="__codelineno-3-40" name="__codelineno-3-40" href="#__codelineno-3-40"></a><span class="w">    </span><span class="s">&quot;hoodie.datasource.write.operation&quot;</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="s">&quot;upsert&quot;</span><span class="p">,</span>
+</span><span id="__span-3-41"><a id="__codelineno-3-41" name="__codelineno-3-41" href="#__codelineno-3-41"></a><span class="w">    </span><span class="s">&quot;hoodie.datasource.write.table.type&quot;</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">tableType</span><span class="p">,</span>
+</span><span id="__span-3-42"><a id="__codelineno-3-42" name="__codelineno-3-42" href="#__codelineno-3-42"></a><span class="w">    </span><span class="s">&quot;hoodie.datasource.write.hive_style_partitioning&quot;</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="s">&quot;true&quot;</span><span class="p">,</span>
+</span><span id="__span-3-43"><a id="__codelineno-3-43" name="__codelineno-3-43" href="#__codelineno-3-43"></a><span class="w">    </span><span class="s">&quot;hoodie.datasource.hive_sync.enable&quot;</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="s">&quot;true&quot;</span><span class="p">,</span>
+</span><span id="__span-3-44"><a id="__codelineno-3-44" name="__codelineno-3-44" href="#__codelineno-3-44"></a><span class="w">    </span><span class="s">&quot;hoodie.datasource.hive_sync.mode&quot;</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="s">&quot;hms&quot;</span><span class="p">,</span>
+</span><span id="__span-3-45"><a id="__codelineno-3-45" name="__codelineno-3-45" href="#__codelineno-3-45"></a><span class="w">    </span><span class="s">&quot;hoodie.datasource.hive_sync.database&quot;</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">dbName</span><span class="p">,</span>
+</span><span id="__span-3-46"><a id="__codelineno-3-46" name="__codelineno-3-46" href="#__codelineno-3-46"></a><span class="w">    </span><span class="s">&quot;hoodie.datasource.hive_sync.table&quot;</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">tableName</span><span class="p">,</span>
+</span><span id="__span-3-47"><a id="__codelineno-3-47" name="__codelineno-3-47" href="#__codelineno-3-47"></a><span class="w">  </span><span class="p">)</span><span class="w"> </span><span class="o">++</span><span class="w"> </span><span class="n">partitionField</span><span class="p">.</span><span class="n">map</span><span class="p">(</span><span class="n">f</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="nc">Map</span><span class="p">(</span><span class="s">&quot;hoodie.datasource.write.partitionpath.field&quot;</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">f</span><span class="p">)).</span><span class="n">getOrElse</span><span class="p">(</span><span class="nc">Map</span><span class="p">.</span><span class="n">empty</span><span class="p">)</span>
+</span><span id="__span-3-48"><a id="__codelineno-3-48" name="__codelineno-3-48" href="#__codelineno-3-48"></a><span class="p">}</span>
+</span><span id="__span-3-49"><a id="__codelineno-3-49" name="__codelineno-3-49" href="#__codelineno-3-49"></a><span class="kd">val</span><span class="w"> </span><span class="n">dataGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="nc">DataGenerator</span>
+</span></code></pre></div>
+<p>Make sure you include a newline character at the very end. Press <code>Ctrl+D</code> to begin executing the pasted code.</p>
+<p>We will complete the same process with our next code block, which will create and populate our table with randomly generated data about taxi trips. Here we specify that we want the table to be a "Copy on Write" table, but this is not strictly necessary - this is the default table type in Hudi.  Notice that we are including an extra column, <code>commit_num</code> that will show us the commit in which any given row was added.</p>
+<div class="language-scala highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kd">val</span><span class="w"> </span><span class="n">inserts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">convertToStringList</span><span class="p">(</span><span class="n">dataGen</span><span class="p">.</span><span class="n">generateInserts</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kd">val</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">spark</span><span class="p">.</span><span class="n">read</span><span class="p">.</span><span class="n">json</span><span class="p">(</span><span class="n">spark</span><span class="p">.</span><span class="n">sparkContext</span><span class="p">.</span><span class="n">parallelize</span><span class="p">(</span><span class="n">inserts</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">))</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="kd">val</span><span class="w"> </span><span class="n">tableName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;trips_table&quot;</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="n">data</span><span class="p">.</span><span class="n">withColumn</span><span class="p">(</span><span class="s">&quot;commit_num&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">lit</span><span class="p">(</span><span class="s">&quot;update1&quot;</span><span class="p">)).</span><span class="n">write</span><span class="p">.</span><span class="n">format</span><span class="p">(</span><span class="s">&quot;hudi&quot;</span><span class="p">).</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">    </span><span class="n">options</span><span class="p">(</span><span class="n">getQuickstartWriteConfigs</span><span class="p">).</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">    </span><span class="n">options</span><span class="p">(</span><span class="n">hudiOptions</span><span class="p">(</span><span class="n">tableName</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;COPY_ON_WRITE&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ts&quot;</span><span class="p">)).</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">    </span><span class="n">mode</span><span class="p">(</span><span class="nc">Overwrite</span><span class="p">).</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">    </span><span class="n">save</span><span class="p">(</span><span class="s">s&quot;</span><span class="si">$</span><span class="n">basePath</span><span class="s">/</span><span class="si">$</span><span class="n">tableName</span><span class="s">&quot;</span><span class="p">);</span>
+</span></code></pre></div>
+<p>Before we go on to query these tables, let's take a look at what files and directories have been created for this table in our s3 storage. Go to MinIO UI <a href="http://localhost:9091">http://localhost:9091</a> and log in with the username and password that we defined in <code>docker-compose.yaml</code> (<code>minio</code>/<code>minio123</code>). Under the <code>hudi-tables</code> path, there should be a single sub-path called <code>trips_table</code>. Below is a look at the file structure.</p>
+<p><img alt="table directory in s3" src="../images/table_dirs.png" /></p>
+<p>We have one parquet data file, a Hudi-specific metadata file, and another sub-path, <code>.hoodie</code>. The latter is where Hudi keeps most of the metadata for the <code>trips_table</code>, including the commit history. We can see that there is one set of <code>commit</code> files created to keep track of the initial data we've inserted into the table. Feel free to explore these files further.</p>
+<p><img alt="hoodie directory" src="../images/hoodie_dir.png" /></p>
+<h2 id="2-query-table-with-presto">2. Query table with Presto<a class="headerlink" href="#2-query-table-with-presto" title="Permanent link">&para;</a></h2>
+<p>Now let's query this table with Presto. In a new terminal tab or window, exec into the Presto container and start the Presto CLI to query our table.</p>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="w"> </span>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>coordinator<span class="w"> </span>presto-cli
+</span></code></pre></div>
+<p>We first specify that we want to use the Hudi catalog and <code>default</code> schema for all queries here on out. The 'default' schema has been implicitly created for us in Presto because it already exists in the Hive metastore. Then, execute a <code>show tables</code> command:</p>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">use</span><span class="w"> </span><span class="n">hudi</span><span class="p">.</span><span class="k">default</span><span class="p">;</span>
+</span></code></pre></div>
+<p>For example:</p>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>presto&gt;<span class="w"> </span>use<span class="w"> </span>hudi.default<span class="p">;</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>USE
+</span></code></pre></div>
+<p>Next, list the available tables:</p>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">show</span><span class="w"> </span><span class="n">tables</span><span class="p">;</span>
+</span></code></pre></div>
+<p>For example:</p>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>presto:default&gt;<span class="w"> </span>show<span class="w"> </span>tables<span class="p">;</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">       </span>Table<span class="w">        </span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>--------------------
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w"> </span>trips_table<span class="w">        </span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="o">(</span><span class="m">1</span><span class="w"> </span>row<span class="o">)</span>
+</span></code></pre></div>
+<p>As expected, we see a single table here with the name of the table we created in the <code>spark-shell</code>. We can run a <code>select *</code> on this data.</p>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">select</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">trips_table</span><span class="w"> </span><span class="k">limit</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+</span></code></pre></div>
+<p>For example:</p>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>presto:default&gt;<span class="w"> </span><span class="k">select</span><span class="w"> </span>*<span class="w"> </span>from<span class="w"> </span>trips_table<span class="w"> </span>limit<span class="w"> </span><span class="m">10</span><span class="p">;</span>
+</span></code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Note: Press "q" to exit out out after you see "(END)"</p>
+</div>
+<p>The results (omitted here for space) show more than you may expect to see with a traditional table. The columns prefixed with <code>_hoodie</code> are metadata properties that Hudi uses to manage the table state. You can also see the original columns at far right of the table (<code>begin_lat</code>, <code>begin_lon</code>, <code>fare</code>, etc.).</p>
+<p>Let's execute a query that pares down these results slightly:</p>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="k">select</span><span class="w"> </span><span class="n">_hoodie_commit_time</span><span class="p">,</span><span class="w"> </span><span class="n">commit_num</span><span class="p">,</span><span class="w"> </span><span class="n">_hoodie_file_name</span><span class="p">,</span><span class="w"> </span><span class="n">fare</span><span class="p">,</span><span class="w"> </span><span class="n">begin_lon</span><span class="p">,</span><span class="w"> </span><span class="n">begin_lat</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">trips_table</span><span class="w"> </span><span class="k">order</span><span class="w"> </span><span class="k">by</span><span class="w"> </span><span class="n">_hoodie_commit_time</span><span class="p">;</span>
+</span></code></pre></div>
+<p>For example:</p>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>presto:default&gt;<span class="w"> </span><span class="k">select</span><span class="w"> </span>_hoodie_commit_time,<span class="w"> </span>commit_num,<span class="w"> </span>_hoodie_file_name,<span class="w"> </span>fare,<span class="w"> </span>begin_lon,<span class="w"> </span>begin_lat<span class="w"> </span>from<span class="w"> </span>trips_table<span class="w"> </span>order<span class="w"> </span>by<span class="w"> </span>_hoodie_commit_time<span class="p">;</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w"> </span>_hoodie_commit_time<span class="w"> </span><span class="p">|</span><span class="w"> </span>commit_num<span class="w"> </span><span class="p">|</span><span class="w">                             </span>_hoodie_file_name<span class="w">                              </span><span class="p">|</span><span class="w">        </span>fare<span class="w">        </span><span class="p">|</span><span class="w">      </span>begin_lon<span class="w">       </span><span class="p">|</span><span class="w">      </span>begin_lat<span class="w">       </span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>---------------------+------------+----------------------------------------------------------------------------+--------------------+----------------------+----------------------
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w"> </span><span class="m">20250729020557937</span><span class="w">   </span><span class="p">|</span><span class="w"> </span>update1<span class="w">    </span><span class="p">|</span><span class="w"> </span>df001f68-16bc-4289-b8f5-755e27aa9cd9-0_0-198-207_20250729020557937.parquet<span class="w"> </span><span class="p">|</span><span class="w">  </span><span class="m">5</span>.064924039635443<span class="w"> </span><span class="p">|</span><span class="w">   </span><span class="m">0</span>.3329328066900805<span class="w"> </span><span class="p">|</span><span class="w">  </span><span class="m">0</span>.05829265790920446<span class="w"> </span>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="w"> </span><span class="m">20250729020557937</span><span class="w">   </span><span class="p">|</span><span class="w"> </span>update1<span class="w">    </span><span class="p">|</span><span class="w"> </span>df001f68-16bc-4289-b8f5-755e27aa9cd9-0_0-198-207_20250729020557937.parquet<span class="w"> </span><span class="p">|</span><span class="w">  </span><span class="m">84</span>.00133794186554<span class="w"> </span><span class="p">|</span><span class="w">   </span><span class="m">0</span>.7041966710545763<span class="w"> </span><span class="p">|</span><span class="w">   </span><span class="m">0</span>.3988839560181455<span class="w"> </span>
+</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="w"> </span><span class="m">20250729020557937</span><span class="w">   </span><span class="p">|</span><span class="w"> </span>update1<span class="w">    </span><span class="p">|</span><span class="w"> </span>df001f68-16bc-4289-b8f5-755e27aa9cd9-0_0-198-207_20250729020557937.parquet<span class="w"> </span><span class="p">|</span><span class="w">  </span><span class="m">26</span>.57512568578202<span class="w"> </span><span class="p">|</span><span class="w">   </span><span class="m">0</span>.4130226064649045<span class="w"> </span><span class="p">|</span><span class="w">  </span><span class="m">0</span>.14944324629969385<span class="w"> </span>
+</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="w"> </span><span class="m">20250729020557937</span><span class="w">   </span><span class="p">|</span><span class="w"> </span>update1<span class="w">    </span><span class="p">|</span><span class="w"> </span>df001f68-16bc-4289-b8f5-755e27aa9cd9-0_0-198-207_20250729020557937.parquet<span class="w"> </span><span class="p">|</span><span class="w">  </span><span class="m">61</span>.44682955106423<span class="w"> </span><span class="p">|</span><span class="w">  </span><span class="m">0</span>.13477337728703764<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="m">0</span>.025339371609693573<span class="w"> </span>
+</span><span id="__span-13-8"><a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="w"> </span><span class="m">20250729020557937</span><span class="w">   </span><span class="p">|</span><span class="w"> </span>update1<span class="w">    </span><span class="p">|</span><span class="w"> </span>df001f68-16bc-4289-b8f5-755e27aa9cd9-0_0-198-207_20250729020557937.parquet<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="m">47</span>.886740443749254<span class="w"> </span><span class="p">|</span><span class="w">  </span><span class="m">0</span>.48671796674575485<span class="w"> </span><span class="p">|</span><span class="w">   </span><span class="m">0</span>.6158099753827585<span class="w"> </span>
+</span><span id="__span-13-9"><a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a><span class="w"> </span><span class="m">20250729020557937</span><span class="w">   </span><span class="p">|</span><span class="w"> </span>update1<span class="w">    </span><span class="p">|</span><span class="w"> </span>df001f68-16bc-4289-b8f5-755e27aa9cd9-0_0-198-207_20250729020557937.parquet<span class="w"> </span><span class="p">|</span><span class="w">  </span><span class="m">74</span>.20408022629255<span class="w"> </span><span class="p">|</span><span class="w">   </span><span class="m">0</span>.8293284066906385<span class="w"> </span><span class="p">|</span><span class="w">  </span><span class="m">0</span>.10155019269585785<span class="w"> </span>
+</span><span id="__span-13-10"><a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a><span class="w"> </span><span class="m">20250729020557937</span><span class="w">   </span><span class="p">|</span><span class="w"> </span>update1<span class="w">    </span><span class="p">|</span><span class="w"> </span>df001f68-16bc-4289-b8f5-755e27aa9cd9-0_0-198-207_20250729020557937.parquet<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="m">43</span>.160518375539205<span class="w"> </span><span class="p">|</span><span class="w">   </span><span class="m">0</span>.8898173709112844<span class="w"> </span><span class="p">|</span><span class="w">   </span><span class="m">0</span>.9937697164202349<span class="w"> </span>
+</span><span id="__span-13-11"><a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a><span class="w"> </span><span class="m">20250729020557937</span><span class="w">   </span><span class="p">|</span><span class="w"> </span>update1<span class="w">    </span><span class="p">|</span><span class="w"> </span>df001f68-16bc-4289-b8f5-755e27aa9cd9-0_0-198-207_20250729020557937.parquet<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="m">55</span>.642805813402006<span class="w"> </span><span class="p">|</span><span class="w">   </span><span class="m">0</span>.9727806198646577<span class="w"> </span><span class="p">|</span><span class="w">  </span><span class="m">0</span>.19982748870912004<span class="w"> </span>
+</span><span id="__span-13-12"><a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a>
+</span><span id="__span-13-13"><a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a><span class="w"> </span><span class="o">(</span>additional<span class="w"> </span>rows<span class="w"> </span>omitted<span class="w"> </span>here...<span class="o">)</span>
+</span></code></pre></div>
+<h2 id="3-add-data-to-table-and-query">3. Add data to table and query<a class="headerlink" href="#3-add-data-to-table-and-query" title="Permanent link">&para;</a></h2>
+<p>Now, let's go back to our <code>spark-shell</code> terminal tab and add more data to our tables using paste mode. Note that our <code>commit_num</code> column value has changed.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Note: If you exit your spark-shell and have to issue another <code>docker exec -it spark /opt/spark/bin/spark-shell</code> to restart it, you need to get into paste mode and reimport all the required packages again as you did above in step 1.</p>
+</div>
+<div class="language-scala highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kd">val</span><span class="w"> </span><span class="n">updates</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">convertToStringList</span><span class="p">(</span><span class="n">dataGen</span><span class="p">.</span><span class="n">generateUpdates</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="kd">val</span><span class="w"> </span><span class="n">updatedData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">spark</span><span class="p">.</span><span class="n">read</span><span class="p">.</span><span class="n">json</span><span class="p">(</span><span class="n">spark</span><span class="p">.</span><span class="n">sparkContext</span><span class="p">.</span><span class="n">parallelize</span><span class="p">(</span><span class="n">updates</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">));</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="n">updatedData</span><span class="p">.</span><span class="n">withColumn</span><span class="p">(</span><span class="s">&quot;commit_num&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">lit</span><span class="p">(</span><span class="s">&quot;update2&quot;</span><span class="p">)).</span><span class="n">write</span><span class="p">.</span><span class="n">format</span><span class="p">(</span><span class="s">&quot;hudi&quot;</span><span class="p">).</span>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="w">    </span><span class="n">options</span><span class="p">(</span><span class="n">getQuickstartWriteConfigs</span><span class="p">).</span>
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="w">    </span><span class="n">options</span><span class="p">(</span><span class="n">hudiOptions</span><span class="p">(</span><span class="n">tableName</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;COPY_ON_WRITE&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ts&quot;</span><span class="p">)).</span>
+</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="w">    </span><span class="n">mode</span><span class="p">(</span><span class="nc">Append</span><span class="p">).</span>
+</span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a><span class="w">    </span><span class="n">save</span><span class="p">(</span><span class="s">s&quot;</span><span class="si">$</span><span class="n">basePath</span><span class="s">/</span><span class="si">$</span><span class="n">tableName</span><span class="s">&quot;</span><span class="p">);</span>
+</span></code></pre></div>
+<p>Now if we query the tables in the Presto CLI, we see that there are multiple commit times, as shown by our first two columns in the below query. Make sure to hold <code>Return</code> in order to see all 100 rows of the updated table.</p>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="k">select</span><span class="w"> </span><span class="n">_hoodie_commit_time</span><span class="p">,</span><span class="w"> </span><span class="n">commit_num</span><span class="p">,</span><span class="w"> </span><span class="n">_hoodie_file_name</span><span class="p">,</span><span class="w"> </span><span class="n">fare</span><span class="p">,</span><span class="w"> </span><span class="n">begin_lon</span><span class="p">,</span><span class="w"> </span><span class="n">begin_lat</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">trips_table</span><span class="w"> </span><span class="k">order</span><span class="w"> </span><span class="k">by</span><span class="w"> </span><span class="n">_hoodie_commit_time</span><span class="p">;</span>
+</span></code></pre></div>
+<p>For example:</p>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>presto:default&gt;<span class="w"> </span><span class="k">select</span><span class="w"> </span>_hoodie_commit_time,<span class="w"> </span>commit_num,<span class="w"> </span>_hoodie_file_name,<span class="w"> </span>fare,<span class="w"> </span>begin_lon,<span class="w"> </span>begin_lat<span class="w"> </span>from<span class="w"> </span>trips_table<span class="w"> </span>order<span class="w"> </span>by<span class="w"> </span>_hoodie_commit_time<span class="p">;</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w"> </span>_hoodie_commit_time<span class="w"> </span><span class="p">|</span><span class="w"> </span>commit_num<span class="w"> </span><span class="p">|</span><span class="w">                             </span>_hoodie_file_name<span class="w">                              </span><span class="p">|</span><span class="w">        </span>fare<span class="w">        </span><span class="p">|</span><span class="w">      </span>begin_lon<span class="w">       </span><span class="p">|</span><span class="w">      </span>begin_lat<span class="w">       </span>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>---------------------+------------+----------------------------------------------------------------------------+--------------------+----------------------+----------------------
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w"> </span><span class="m">20250729020557937</span><span class="w">   </span><span class="p">|</span><span class="w"> </span>update1<span class="w">    </span><span class="p">|</span><span class="w"> </span>dd513af1-2291-4fea-a588-06e7c55fec23-0_0-50-53_20250729230015275.parquet<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="m">25</span>.200733895704396<span class="w"> </span><span class="p">|</span><span class="w">   </span><span class="m">0</span>.9805032518130713<span class="w"> </span><span class="p">|</span><span class="w">   </span><span class="m">0</span>.3250925842689032<span class="w"> </span>
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="w"> </span><span class="m">20250729020557937</span><span class="w">   </span><span class="p">|</span><span class="w"> </span>update1<span class="w">    </span><span class="p">|</span><span class="w"> </span>dd513af1-2291-4fea-a588-06e7c55fec23-0_0-50-53_20250729230015275.parquet<span class="w"> </span><span class="p">|</span><span class="w">  </span><span class="m">80</span>.22532741048674<span class="w"> </span><span class="p">|</span><span class="w">  </span><span class="m">0</span>.23558979258614088<span class="w"> </span><span class="p">|</span><span class="w">   </span><span class="m">0</span>.9106955060439053<span class="w"> </span>
+</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="w"> </span><span class="m">20250729020557937</span><span class="w">   </span><span class="p">|</span><span class="w"> </span>update1<span class="w">    </span><span class="p">|</span><span class="w"> </span>dd513af1-2291-4fea-a588-06e7c55fec23-0_0-50-53_20250729230015275.parquet<span class="w"> </span><span class="p">|</span><span class="w">  </span><span class="m">84</span>.00133794186554<span class="w"> </span><span class="p">|</span><span class="w">   </span><span class="m">0</span>.7041966710545763<span class="w"> </span><span class="p">|</span><span class="w">   </span><span class="m">0</span>.3988839560181455<span class="w"> </span>
+</span><span id="__span-16-7"><a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="w"> </span><span class="m">20250729020557937</span><span class="w">   </span><span class="p">|</span><span class="w"> </span>update1<span class="w">    </span><span class="p">|</span><span class="w"> </span>dd513af1-2291-4fea-a588-06e7c55fec23-0_0-50-53_20250729230015275.parquet<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="m">27</span>.793208764156986<span class="w"> </span><span class="p">|</span><span class="w">   </span><span class="m">0</span>.9676738239915396<span class="w"> </span><span class="p">|</span><span class="w">   </span><span class="m">0</span>.5075033998567434<span class="w"> </span>
+</span><span id="__span-16-8"><a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a><span class="w"> </span><span class="m">20250729020557937</span><span class="w">   </span><span class="p">|</span><span class="w"> </span>update1<span class="w">    </span><span class="p">|</span><span class="w"> </span>dd513af1-2291-4fea-a588-06e7c55fec23-0_0-50-53_20250729230015275.parquet<span class="w"> </span><span class="p">|</span><span class="w">  </span><span class="m">61</span>.44682955106423<span class="w"> </span><span class="p">|</span><span class="w">  </span><span class="m">0</span>.13477337728703764<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="m">0</span>.025339371609693573<span class="w"> </span>
+</span><span id="__span-16-9"><a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a><span class="w"> </span><span class="m">20250729020557937</span><span class="w">   </span><span class="p">|</span><span class="w"> </span>update1<span class="w">    </span><span class="p">|</span><span class="w"> </span>dd513af1-2291-4fea-a588-06e7c55fec23-0_0-50-53_20250729230015275.parquet<span class="w"> </span><span class="p">|</span><span class="w">  </span><span class="m">90</span>.97255481383131<span class="w"> </span><span class="p">|</span><span class="w">   </span><span class="m">0</span>.7196037664723752<span class="w"> </span><span class="p">|</span><span class="w">   </span><span class="m">0</span>.9539455886006297<span class="w"> </span>
+</span><span id="__span-16-10"><a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a><span class="w"> </span><span class="m">20250729020557937</span><span class="w">   </span><span class="p">|</span><span class="w"> </span>update1<span class="w">    </span><span class="p">|</span><span class="w"> </span>dd513af1-2291-4fea-a588-06e7c55fec23-0_0-50-53_20250729230015275.parquet<span class="w"> </span><span class="p">|</span><span class="w">  </span><span class="m">51</span>.61325440476856<span class="w"> </span><span class="p">|</span><span class="w">  </span><span class="m">0</span>.36749492639453507<span class="w"> </span><span class="p">|</span><span class="w">   </span><span class="m">0</span>.7666637026082733<span class="w"> </span>
+</span><span id="__span-16-11"><a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a>
+</span><span id="__span-16-12"><a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a><span class="w"> </span><span class="o">(</span>additional<span class="w"> </span>rows<span class="w"> </span>omitted<span class="w"> </span>here...<span class="o">)</span>
+</span><span id="__span-16-13"><a id="__codelineno-16-13" name="__codelineno-16-13" href="#__codelineno-16-13"></a><span class="w"> </span><span class="m">20250729230015275</span><span class="w">   </span><span class="p">|</span><span class="w"> </span>update2<span class="w">    </span><span class="p">|</span><span class="w"> </span>dd513af1-2291-4fea-a588-06e7c55fec23-0_0-50-53_20250729230015275.parquet<span class="w"> </span><span class="p">|</span><span class="w">   </span><span class="m">48</span>.68719058185585<span class="w"> </span><span class="p">|</span><span class="w">   </span><span class="m">0</span>.4795784679677898<span class="w"> </span><span class="p">|</span><span class="w">  </span><span class="m">0</span>.25038172085518196<span class="w"> </span>
+</span><span id="__span-16-14"><a id="__codelineno-16-14" name="__codelineno-16-14" href="#__codelineno-16-14"></a><span class="w"> </span><span class="m">20250729230015275</span><span class="w">   </span><span class="p">|</span><span class="w"> </span>update2<span class="w">    </span><span class="p">|</span><span class="w"> </span>dd513af1-2291-4fea-a588-06e7c55fec23-0_0-50-53_20250729230015275.parquet<span class="w"> </span><span class="p">|</span><span class="w">   </span><span class="m">75</span>.48568723276352<span class="w"> </span><span class="p">|</span><span class="w">  </span><span class="m">0</span>.15381057911655593<span class="w"> </span><span class="p">|</span><span class="w">   </span><span class="m">0</span>.9767478911589815<span class="w"> </span>
+</span><span id="__span-16-15"><a id="__codelineno-16-15" name="__codelineno-16-15" href="#__codelineno-16-15"></a><span class="w"> </span><span class="m">20250729230015275</span><span class="w">   </span><span class="p">|</span><span class="w"> </span>update2<span class="w">    </span><span class="p">|</span><span class="w"> </span>dd513af1-2291-4fea-a588-06e7c55fec23-0_0-50-53_20250729230015275.parquet<span class="w"> </span><span class="p">|</span><span class="w">   </span><span class="m">45</span>.81290455568438<span class="w"> </span><span class="p">|</span><span class="w">  </span><span class="m">0</span>.02795404977976812<span class="w"> </span><span class="p">|</span><span class="w">    </span><span class="m">0</span>.712778116485955<span class="w"> </span>
+</span><span id="__span-16-16"><a id="__codelineno-16-16" name="__codelineno-16-16" href="#__codelineno-16-16"></a><span class="w"> </span><span class="m">20250729230015275</span><span class="w">   </span><span class="p">|</span><span class="w"> </span>update2<span class="w">    </span><span class="p">|</span><span class="w"> </span>dd513af1-2291-4fea-a588-06e7c55fec23-0_0-50-53_20250729230015275.parquet<span class="w"> </span><span class="p">|</span><span class="w">  </span><span class="m">57</span>.516128683731594<span class="w"> </span><span class="p">|</span><span class="w">   </span><span class="m">0</span>.9507437299992999<span class="w"> </span><span class="p">|</span><span class="w">    </span><span class="m">0</span>.651681577874527<span class="w"> </span>
+</span><span id="__span-16-17"><a id="__codelineno-16-17" name="__codelineno-16-17" href="#__codelineno-16-17"></a><span class="w"> </span><span class="m">20250729230015275</span><span class="w">   </span><span class="p">|</span><span class="w"> </span>update2<span class="w">    </span><span class="p">|</span><span class="w"> </span>dd513af1-2291-4fea-a588-06e7c55fec23-0_0-50-53_20250729230015275.parquet<span class="w"> </span><span class="p">|</span><span class="w">    </span><span class="m">77</span>.6244653745167<span class="w"> </span><span class="p">|</span><span class="w">   </span><span class="m">0</span>.6935649065845402<span class="w"> </span><span class="p">|</span><span class="w">  </span><span class="m">0</span>.49277090579957905<span class="w"> </span>
+</span><span id="__span-16-18"><a id="__codelineno-16-18" name="__codelineno-16-18" href="#__codelineno-16-18"></a><span class="w"> </span><span class="m">20250729230015275</span><span class="w">   </span><span class="p">|</span><span class="w"> </span>update2<span class="w">    </span><span class="p">|</span><span class="w"> </span>dd513af1-2291-4fea-a588-06e7c55fec23-0_0-50-53_20250729230015275.parquet<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="m">0</span>.09544772278234914<span class="w"> </span><span class="p">|</span><span class="w">   </span><span class="m">0</span>.6651362795967237<span class="w"> </span><span class="p">|</span><span class="w">   </span><span class="m">0</span>.8866112536048135<span class="w"> </span>
+</span><span id="__span-16-19"><a id="__codelineno-16-19" name="__codelineno-16-19" href="#__codelineno-16-19"></a><span class="w"> </span><span class="m">20250729230015275</span><span class="w">   </span><span class="p">|</span><span class="w"> </span>update2<span class="w">    </span><span class="p">|</span><span class="w"> </span>dd513af1-2291-4fea-a588-06e7c55fec23-0_0-50-53_20250729230015275.parquet<span class="w"> </span><span class="p">|</span><span class="w">   </span><span class="m">94</span>.61601725825764<span class="w"> </span><span class="p">|</span><span class="w">  </span><span class="m">0</span>.02466985290858581<span class="w"> </span><span class="p">|</span><span class="w">     </span><span class="m">0</span>.53126878881263<span class="w"> </span>
+</span></code></pre></div>
+<p>We can see that the values in the <code>_hoodie_file_name</code> have changed for the entries from the first commit. This is to be expected, as we created a "Copy on Write" table (the default table type in Hudi). We can also look in the MinIO UI again to see the different files that have been created. Notice that there is a new data file that holds the data added in the most recent commit as well as the previous commit's data as well.</p>
+<p><img alt="updated table data files" src="../images/table_dirs2.png" /></p>
+<p>In the <code>.hoodie</code> directory, we can also see additional commit files that have been added since the last time we checked. At this point, feel free to continue executing queries and adding data as desired to get familiar with Hudi functionality. You may also move on to lab 3.</p>
+<h3 id="optional-shutdown">Optional shutdown<a class="headerlink" href="#optional-shutdown" title="Permanent link">&para;</a></h3>
+<p>If you do not intend to go on to lab 3 right now, you can shut down your lakehouse cluster with the following command:</p>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>docker<span class="w"> </span>compose<span class="w"> </span>down<span class="w"> </span>-v
+</span></code></pre></div>
+<p>This command will stop all containers and remove the volumes. You can omit the <code>-v</code> parameter if you want to keep your existing data for the <code>trips_table</code> in your MinIO storage and come back to complete lab 3 later.</p>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../lab-2/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Lab 2. Create and Query Iceberg Tables">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Lab 2. Create and Query Iceberg Tables
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../lab-4/" class="md-footer__link md-footer__link--next" aria-label="Next: Lab 4. Explore Hudi Table &amp; Query Types">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Lab 4. Explore Hudi Table & Query Types
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2023- IBM Developer
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/ibm" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://twitter.com/ibmdeveloper" target="_blank" rel="noopener" title="twitter.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M459.4 151.7c.3 4.5.3 9.1.3 13.6 0 138.7-105.6 298.6-298.6 298.6-59.5 0-114.7-17.2-161.1-47.1 8.4 1 16.6 1.3 25.3 1.3 49.1 0 94.2-16.6 130.3-44.8-46.1-1-84.8-31.2-98.1-72.8 6.5 1 13 1.6 19.8 1.6 9.4 0 18.8-1.3 27.6-3.6-48.1-9.7-84.1-52-84.1-103v-1.3c14 7.8 30.2 12.7 47.4 13.3-28.3-18.8-46.8-51-46.8-87.4 0-19.5 5.2-37.4 14.3-53C87.4 130.8 165 172.4 252.1 176.9c-1.6-7.8-2.6-15.9-2.6-24C249.5 95.1 296.3 48 354.4 48c30.2 0 57.5 12.7 76.7 33.1 23.7-4.5 46.5-13.3 66.6-25.3-7.8 24.4-24.4 44.8-46.1 57.8 21.1-2.3 41.6-8.1 60.4-16.2-14.3 20.8-32.2 39.3-52.6 54.3"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://www.linkedin.com/company/ibm/" target="_blank" rel="noopener" title="www.linkedin.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3M135.4 416H69V202.2h66.5V416zM102.2 96a38.5 38.5 0 1 1 0 77 38.5 38.5 0 1 1 0-77m282.1 320h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://www.youtube.com/user/developerworks" target="_blank" rel="noopener" title="www.youtube.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M549.7 124.1c-6.2-23.7-24.8-42.3-48.3-48.6C458.9 64 288.1 64 288.1 64S117.3 64 74.7 75.5c-23.5 6.3-42 24.9-48.3 48.6C15 167 15 256.4 15 256.4s0 89.4 11.4 132.3c6.3 23.6 24.8 41.5 48.3 47.8C117.3 448 288.1 448 288.1 448s170.8 0 213.4-11.5c23.5-6.3 42-24.2 48.3-47.8 11.4-42.9 11.4-132.3 11.4-132.3s0-89.4-11.4-132.3zM232.2 337.6V175.2l142.7 81.2z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://dev.to/ibmdeveloper" target="_blank" rel="noopener" title="dev.to" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M120.1 208.3c-3.9-2.9-7.8-4.3-11.6-4.3H91.1v104.5h17.4c3.9 0 7.8-1.4 11.6-4.3s5.8-7.3 5.8-13.1v-69.7c0-5.8-2-10.2-5.8-13.1M404.1 32H43.9C19.7 32 .1 51.6 0 75.8v360.4C.1 460.4 19.7 480 43.9 480h360.2c24.2 0 43.8-19.6 43.9-43.8V75.8c-.1-24.2-19.7-43.8-43.9-43.8M154.2 291.2c0 18.8-11.6 47.3-48.4 47.3H59.4V173h47.4c35.4 0 47.4 28.5 47.4 47.3zm100.7-88.7h-53.3v38.4h32.6v29.6h-32.6v38.4h53.3v29.6h-62.2c-11.2.3-20.4-8.5-20.7-19.7V193.7c-.3-11.1 8.6-20.4 19.7-20.7h63.2zm103.6 115.3c-13.2 30.7-36.8 24.6-47.4 0L272.6 173h32.6l29.7 113.7L364.5 173h32.6l-38.5 144.8z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "..", "features": ["navigation.tabs", "content.code.copy", "content.code.select", "content.code.annotate", "navigation.footer"], "search": "../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.f55a23d4.min.js"></script>
+      
+    
+  </body>
+</html>
